@@ -38,25 +38,22 @@ void HRClock::timerExpired()
 
 
 StdClock::StdClock(const QString &fontFamily, const int fontSize, const int period)
-    : HRClock(fontFamily, fontSize, period)
+    : HRClock(fontFamily, fontSize, period), label(NO_TIME)
 {
-    this->label = new QLabel(NO_TIME, this);
-    this->label->setFont(this->font);
-
-    QLayout *layout = new QVBoxLayout;
-    layout->addWidget(this->label);
-    this->setLayout(layout);
+    this->label.setFont(this->font);
+    this->label.show();
 }
 
 void StdClock::updateText(const QString &newText)
 {
-    this->label->setText(newText);
+    this->label.setText(newText);
 }
 
 
 GLClock::GLClock(const QString &fontFamily, const int fontSize, const int period)
     : HRClock(fontFamily, fontSize, period)
 {
+    this->window.show();
 }
 
 void GLClock::updateText(const QString &newText)
@@ -101,6 +98,26 @@ int main(int argc, char *argv[])
             }
         } else if (arg == "-opengl") {
             useOpengl = true;
+        } else if (arg == "-font") {
+            if (args.isEmpty()) {
+                qCritical() << "You must specify the font family";
+                app.quit();
+            } else {
+                fontFamily = args.takeFirst();
+            }
+        } else if (arg == "-fontsize") {
+            if (args.isEmpty()) {
+                qCritical() << "You must specified the font size";
+                app.quit();
+            } else {
+                bool ok;
+                const QString &arg1 = args.takeFirst();
+                fontSize = arg1.toInt(&ok);
+                if (!ok) {
+                    qCritical() << arg1 << "is not a valid font size";
+                    app.quit();
+                }
+            }
         } else {
             qCritical() << "Unknown argument:" << arg;
             app.quit();
@@ -112,7 +129,6 @@ int main(int argc, char *argv[])
         clock = new GLClock(fontFamily, fontSize, period);
     else
         clock = new StdClock(fontFamily, fontSize, period);
-    clock->show();
 
     return app.exec();
 }

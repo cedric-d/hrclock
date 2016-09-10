@@ -2,12 +2,13 @@
 #define HRCLOCK_H
 
 #include <QFont>
+#include <QGLWidget>
 #include <QLabel>
 #include <QString>
 #include <QTimer>
 #include <QWidget>
 
-class HRClock : public QWidget
+class HRClock : public QObject
 {
     Q_OBJECT
 public:
@@ -24,6 +25,7 @@ private slots:
 
 protected:
     QFont font;
+
 private:
     QTimer timer;
 };
@@ -38,7 +40,7 @@ protected:
     void updateText(const QString &newText);
 
 private:
-    QLabel *label;
+    QLabel label;
 };
 
 class GLClock : public HRClock
@@ -49,6 +51,9 @@ public:
 
 protected:
     void updateText(const QString &newText);
+
+private:
+    QGLWidget window;
 };
 
 #endif
